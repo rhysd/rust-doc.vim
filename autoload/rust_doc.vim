@@ -11,7 +11,7 @@ function! s:error(msg) abort
     echohl None
 endfunction
 
-function! rust_doc#find_rust_project_dir(hint)
+function! rust_doc#find_rust_project_dir(hint) abort
     let path = fnamemodify(a:hint, ':p')
     if filereadable(path)
         let path = fnamemodify(path, ':h')
@@ -32,7 +32,7 @@ function! rust_doc#find_rust_project_dir(hint)
     return fnamemodify(cargo, ':h')
 endfunction
 
-function! s:open(url)
+function! s:open(url) abort
     if g:rust_doc#vim_open_cmd != ''
         execute g:rust_doc#vim_open_cmd a:url
         return
@@ -101,7 +101,39 @@ function! rust_doc#get_modules(doc) abort
                 \ }")
 endfunction
 
-function! s:open_crate_doc(doc, name) abort
+function! rust_doc#get_identifiers(module_html_path) abort
+    let module_dir = fnamemodify(a:module_html_path, ':p:h')
+    if !isdirectory(module_dir)
+        call s:error("Invalid path: " . module_dir)
+        return []
+    endif
+
+    let htmls = split(glob(module_dir . '/*.*.html'), "\n")
+    return map(htmls, "{
+            \   'path' : v:val,
+            \   'name' : matchstr(fnamemodify(v:val, ':t'), '^[^.]*\\.\\zs.\\+\\ze\\.html'),
+            \ }")
+endfunction
+
+function! s:show_module_list(modules, doc, name) abort
+    if g:rust_doc#do_not_ask_for_module_list
+        call s:error(printf("No document was found for '%s'. Document dir was '%s'", a:name, a:doc))
+        return
+    endif
+
+    if empty(a:modules)
+        echomsg "No module is found"
+        return
+    endif
+
+    if input("No document was found for '" . a:name . "'. Do you see the list of modules?(Y/n): ") =~? '^y\=$'
+        for m in a:modules
+            echo m.name
+        endfor
+    endif
+endfunction
+
+function! s:open_doc(doc, name) abort
     let modules = rust_doc#get_modules(a:doc)
     for m in modules
         if m.name == a:name
@@ -110,19 +142,50 @@ function! s:open_crate_doc(doc, name) abort
         endif
     endfor
 
+    call s:show_module_list(modules, a:doc, a:name)
+endfunction
+
+function! s:show_identifier_list(module_name, identifiers, doc, name) abort
+    let name = a:module_name . '::' . a:name
     if g:rust_doc#do_not_ask_for_module_list
-        call s:error(printf("No document was found for '%s'. Document dir was '%s'", a:name, a:doc))
+        call s:error(printf("No document was found for '%s'. Document dir was '%s'", name, a:doc))
         return
     endif
 
-    if input("No document was found. Do you see the list of modules?(Y/n): ") =~? 'y\='
-        for m in modules
-            echo m.name
+    if empty(a:identifiers)
+        echomsg "No identifier is found in " . a:module_name
+        return
+    endif
+
+    if input("No document was found for '" . name . "'. Do you see the list of identifiers?(Y/n): ") =~? 'y\='
+        for i in a:identifiers
+            echo a:module_name . '::' . i.name
         endfor
     endif
 endfunction
 
-function! rust_doc#open(...)
+function! s:open_doc_with_identifier(doc, name, identifier) abort
+    let all_modules = rust_doc#get_modules(a:doc)
+    let modules = filter(copy(all_modules), 'v:val["name"] == a:name')
+    if empty(modules)
+        call s:show_module_list(all_modules, a:doc, a:name)
+        return
+    endif
+
+    let module = modules[0]
+
+    let identifiers = rust_doc#get_identifiers(module.path)
+    for i in identifiers
+        if i.name == a:identifier
+            call s:open(i.path)
+            return
+        endif
+    endfor
+
+    call s:show_identifier_list(module.name, identifiers, a:doc, a:identifier)
+endfunction
+
+function! rust_doc#open(...) abort
     let project = rust_doc#find_rust_project_dir(getcwd())
     if project ==# ''
         return
@@ -134,16 +197,16 @@ function! rust_doc#open(...)
     endif
 
     if a:0 == 1
-        call s:open_crate_doc(doc, a:1)
+        call s:open_doc(doc, a:1)
     elseif a:0 == 2
-        call s:open_crate_doc_with_query(doc, a:1, a:2)
+        call s:open_doc_with_identifier(doc, a:1, a:2)
     else
         call s:error("Wrong number of argument(s): " . a:0 . " for 1 or 2")
     endif
 endfunction
 
-function! rust_doc#complete_cmd(arglead, cmdline, cursorpos)
-    let args = split(a:cmdline, '\s\+')
+function! rust_doc#complete_cmd(arglead, cmdline, cursorpos) abort
+    let args = split(a:cmdline, '\s\+', 1)
     let len = len(args)
 
     silent let project = rust_doc#find_rust_project_dir(getcwd())
@@ -156,7 +219,7 @@ function! rust_doc#complete_cmd(arglead, cmdline, cursorpos)
         return []
     endif
 
-    if len <= 2
+    if len == 2
         " Complete module name
         let candidates = map(rust_doc#get_modules(doc), 'v:val["name"]')
         if len == 2
@@ -165,6 +228,15 @@ function! rust_doc#complete_cmd(arglead, cmdline, cursorpos)
         return sort(candidates)
     elseif len == 3
         " Complete query name
+        for m in rust_doc#get_modules(doc)
+            if m.name == args[1]
+                let candidates = map(rust_doc#get_identifiers(m.path), 'v:val["name"]')
+                if args[2] != ''
+                    let candidates = filter(candidates, 'stridx(v:val, args[2]) == 0')
+                endif
+                return sort(candidates)
+            endif
+        endfor
         return []
     endif
 
