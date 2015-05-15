@@ -1,0 +1,158 @@
+*rust-doc.txt*          Search and open Rust document in your crate from Vim.
+
+Author : rhysd <lin90162@yahoo.co.jp>
+Version : 0.1
+
+CONTENTS                *rust-doc.vim-contents*
+
+Introduction            |rust-doc.vim-introduction|
+Install                 |rust-doc.vim-install|
+Usage                   |rust-doc.vim-usage|
+Variables               |rust-doc.vim-variables|
+Repository              |rust-doc.vim-repository-page|
+License                 |rust-doc.vim-lisence|
+
+
+==============================================================================
+INTRODUCTION                                         *rust-doc.vim-introduction*
+
+*rust-doc.vim* searches documents in your crate and opens it by browser.  You
+can use 3 interfaces to open them.
+
+- |:RustDoc| command for detailed search
+- |K| mapping in your Rust code to search under the cursor
+- |unite.vim| source to list up all candidates and select one
+
+
+==============================================================================
+INSTALL                                                   *rust-doc.vim-install*
+
+If you use some plugin manager, please follow the instruction of them.
+For example, you can install this plugin with |neobundle.vim| as below.
+>
+    NeoBundle 'rhysd/rust-doc.vim'
+<
+Otherwise, copy all directories and files in "autoload", "plugin" and "doc"
+directories to your "~/.vim" directory's corresponding directories.
+
+
+==============================================================================
+USAGE                                                       *rust-doc.vim-usage*
+
+As described above, 3 interfaces are available.
+
+------------------------------------------------------------------------------
+1. |:RustDoc| command
+
+    *:RustDoc* {crate-or-module} [{identifier}]            *rust-doc.vim-:RustDoc*
+
+        You can search the documents in your crate with crate name or module
+        name with identifier.  Identifier is a name of constant, trait, struct
+        and so on.
+
+        For example, assume your crate uses "rand" crate.
+
+>
+        (1) :RustDoc rand
+        (2) :RustDoc rand::distributions
+        (3) :RustDoc rand Rng
+<
+
+        (1) opens the document for crate rand.
+        (2) opens the document for module rand::distributions.
+        (3) opens the document for trait rand::Rng.
+
+    *RustDocFuzzy* {identifier}                       *rust-doc.vim-:RustDocFuzzy*
+
+        |rust-doc.vim| searches the documents in your crate with {identifier}
+        fuzzily.  It lists up all possibilities and you can select one of
+        them.  If only one candidate exists, |rust-doc.vim| opens it instantly.
+
+        e.g.
+>
+        :RustDocFuzzy distributions
+<
+------------------------------------------------------------------------------
+2. |K| mapping in your Rust code                          *rust-doc.vim-K-mapping*
+
+
+    |rust-doc.vim| automatically overwrites default |K| mapping only in Rust
+    code.  The K mapping opens most corresponding document in your crate.
+    It is available in normal mode and visual mode.  In normal mode, the word
+    under the cursor is used.  In visual mode, the selected text is used.
+
+------------------------------------------------------------------------------
+3. |unite.vim| source                                  *rust-doc.vim-unite-source*
+
+    You can select from all document candidates in your crate with unite.vim
+    interface.
+>
+    :Unite rust/doc
+<
+
+==============================================================================
+VARIABLES                                               *rust-doc.vim-variables*
+
+g:rust_doc#vim_open_cmd                                *g:rust_doc#vim_open_cmd*
+
+Vim command to open the path to a document.  |rust-doc.vim| uses it to open the
+document if it is not empty.  The command must take a URL to the local file.
+
+
+g:rust_doc#open_cmd                                        *g:rust_doc#open_cmd*
+
+Shell command to open the path to a document.  |rust-doc.vim| uses it to open
+the document if it is not empty.  The command must take a URL to the local
+file.
+
+
+g:rust_doc#do_not_ask_for_module_list
+                                         *g:rust_doc#do_not_ask_for_module_list*
+
+If the value is 1, |rust-doc.vim|| never ask if it shows the list of
+modules/identifiers when no document is found.
+The default value is 0.
+
+
+g:rust_doc#define_map_K                                *g:rust_doc#define_map_K*
+
+If the value is 1, |K| mappings described above is defined.
+The default value is 1.
+
+
+==============================================================================
+REPOSITORY PAGE                                   *rust-doc.vim-repository-page*
+
+The repository of |rust-doc.vim| is hosted in GitHub.
+
+https://github.com/rhysd/rust-doc.vim
+
+
+==============================================================================
+LICENSE                                                   *rust-doc.vim-license*
+
+|rust-doc.vim| is distributed under The MIT license.
+
+  Copyright (c) 2015 rhysd
+
+  Permission is hereby granted, free of charge, to any person obtaining
+  a copy of this software and associated documentation files (the
+  "Software"), to deal in the Software without restriction, including
+  without limitation the rights to use, copy, modify, merge, publish,
+  distribute, sublicense, and/or sell copies of the Software, and to
+  permit persons to whom the Software is furnished to do so, subject to
+  the following conditions:
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+==============================================================================
+vim:tw=78:colorcolumn=78:ts=8:ft=help:norl:et:fen:fdl=0:
