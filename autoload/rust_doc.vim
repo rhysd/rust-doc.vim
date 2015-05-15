@@ -4,6 +4,7 @@ set cpo&vim
 let g:rust_doc#vim_open_cmd = get(g:, 'rust_doc#vim_open_cmd', '')
 let g:rust_doc#open_cmd = get(g:, 'rust_doc#open_cmd', '')
 let g:rust_doc#do_not_ask_for_module_list = get(g:, 'rust_doc#do_not_ask_for_module_list', 0)
+let g:rust_doc#define_map_K = get(g:, 'rust_doc#define_map_K', 1)
 
 function! s:error(msg) abort
     echohl Error
@@ -51,7 +52,7 @@ function! s:open(url) abort
     catch /^Vim\%((\a\+)\)\=:E117/
         if has('win32') || has('win64')
             let cmd = 'rundll32 url.dll,FileProtocolHandler ' . a:url
-        elseif executable('xdg-open')
+        elseif executable('xdg-open') && has('unix')
             let cmd = 'xdg-open ' . a:url
         elseif executable('open') && has('mac')
             let cmd = 'open ' . a:url
@@ -63,6 +64,7 @@ function! s:open(url) abort
             call s:error("No command is found to open URL. Please set g:rust_doc#open_cmd")
             return
         endif
+
         let output = system(cmd)
         if v:shell_error
             call s:error("Failed to open URL: " . output)
@@ -216,7 +218,21 @@ function! rust_doc#open(...) abort
 endfunction
 
 function! rust_doc#open_fuzzy(idenfitier) abort
-    let identifiers = rust_doc#get_all_module_identifiers()
+    let doc = s:doc_dir(getcwd())
+    if doc ==# ''
+        return
+    endif
+
+    let identifiers = rust_doc#get_all_module_identifiers(doc)
+
+    for i in identifiers
+        if i.name =~# '\<' . a:idenfitier . '\>'
+            call s:open(i.path)
+            return
+        endif
+    endfor
+
+    echomsg "No document is found for '" . a:idenfitier . "'"
 endfunction
 
 function! rust_doc#complete_cmd(arglead, cmdline, cursorpos) abort
