@@ -3,6 +3,8 @@ Open Rust document in your crate in Vim
 
 <!-- Screen shot here -->
 
+`cargo` has a nice feature to generate document.  But it doesn't have a feature to search it.  This plugin searches a document in your crate from Vim.
+
 ## Usage
 
 - `:RustDoc` command
@@ -24,7 +26,7 @@ And `:RustDocFuzzy` command is also available to search the argument fuzzily.
 
 - Mapping `K`
 
-Entering key `K` in your Rust source opens most corresponding document in your crate.
+Entering key `K` in your Rust source opens a document most corresponding to a word under the cursor in your crate.
 
 `K` mapping is available in normal mode and visual mode.  In normal mode, the word under the cursor is used.  In visual mode, the selected text is used.
 
