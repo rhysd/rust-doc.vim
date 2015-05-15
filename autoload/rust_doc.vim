@@ -73,8 +73,13 @@ function! s:open(url) abort
     " Open the url in Vim via html2text
 endfunction
 
-function! s:doc_dir(project_root) abort
-    let d = a:project_root . '/target/doc/'
+function! s:doc_dir(hint) abort
+    let project_root = rust_doc#find_rust_project_dir(a:hint)
+    if project_root ==# ''
+        return ''
+    endif
+
+    let d = project_root . '/target/doc/'
 
     if !isdirectory(d)
         echom "'doc' directory is not found. Executing `cargo doc`..."
@@ -113,6 +118,16 @@ function! rust_doc#get_identifiers(module_html_path) abort
             \   'path' : v:val,
             \   'name' : matchstr(fnamemodify(v:val, ':t'), '^[^.]*\\.\\zs.\\+\\ze\\.html'),
             \ }")
+endfunction
+
+function! rust_doc#get_all_module_identifiers(doc) abort
+    let ret = []
+    for m in rust_doc#get_modules(a:doc)
+        let ret += [m]
+        let ret += rust_doc#get_identifiers(m.path)
+    endfor
+
+    return ret
 endfunction
 
 function! s:show_module_list(modules, doc, name) abort
@@ -186,12 +201,7 @@ function! s:open_doc_with_identifier(doc, name, identifier) abort
 endfunction
 
 function! rust_doc#open(...) abort
-    let project = rust_doc#find_rust_project_dir(getcwd())
-    if project ==# ''
-        return
-    endif
-
-    let doc = s:doc_dir(project)
+    let doc = s:doc_dir(getcwd())
     if doc ==# ''
         return
     endif
@@ -205,16 +215,15 @@ function! rust_doc#open(...) abort
     endif
 endfunction
 
+function! rust_doc#open_fuzzy(idenfitier) abort
+    let identifiers = rust_doc#get_all_module_identifiers()
+endfunction
+
 function! rust_doc#complete_cmd(arglead, cmdline, cursorpos) abort
     let args = split(a:cmdline, '\s\+', 1)
     let len = len(args)
 
-    silent let project = rust_doc#find_rust_project_dir(getcwd())
-    if project ==# ''
-        return []
-    endif
-
-    silent let doc = s:doc_dir(project)
+    silent let doc = s:doc_dir(getcwd())
     if doc ==# ''
         return []
     endif
