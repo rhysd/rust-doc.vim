@@ -75,7 +75,7 @@ function! s:open(url) abort
     " Open the url in Vim via html2text
 endfunction
 
-function! s:doc_dir(hint) abort
+function! rust_doc#get_doc_dir(hint) abort
     let project_root = rust_doc#find_rust_project_dir(a:hint)
     if project_root ==# ''
         return ''
@@ -126,7 +126,11 @@ function! rust_doc#get_all_module_identifiers(doc) abort
     let ret = []
     for m in rust_doc#get_modules(a:doc)
         let ret += [m]
-        let ret += rust_doc#get_identifiers(m.path)
+        let identifiers = rust_doc#get_identifiers(m.path)
+        for i in identifiers
+            let i.name = m.name . '::' . i.name
+        endfor
+        let ret += identifiers
     endfor
 
     return ret
@@ -203,7 +207,7 @@ function! s:open_doc_with_identifier(doc, name, identifier) abort
 endfunction
 
 function! rust_doc#open(...) abort
-    let doc = s:doc_dir(getcwd())
+    let doc = rust_doc#get_doc_dir(getcwd())
     if doc ==# ''
         return
     endif
@@ -217,29 +221,56 @@ function! rust_doc#open(...) abort
     endif
 endfunction
 
-function! rust_doc#open_fuzzy(idenfitier) abort
-    let doc = s:doc_dir(getcwd())
+function! rust_doc#complete_fuzzy_result(...) abort
+    if !exists('s:last_fuzzy_candidates')
+        return []
+    else
+        return s:last_fuzzy_candidates
+    endif
+endfunction
+
+function! rust_doc#open_fuzzy(identifier) abort
+    let doc = rust_doc#get_doc_dir(getcwd())
     if doc ==# ''
         return
     endif
 
     let identifiers = rust_doc#get_all_module_identifiers(doc)
 
+    let found = []
     for i in identifiers
-        if i.name =~# '\<' . a:idenfitier . '\>'
-            call s:open(i.path)
+        if i.name =~# '\<' . a:identifier . '\>'
+            let found += [i]
+        endif
+    endfor
+
+    if empty(found)
+        echomsg "No document is found for '" . a:identifier . "'"
+        return
+    endif
+
+    if len(found) == 1
+        call s:open(found[0].path)
+        return
+    endif
+
+    let s:last_fuzzy_candidates = join(map(copy(found), 'v:val["name"]'), "\n")
+    let input = input(s:last_fuzzy_candidates . "\n\nSelect one in above list: ", '', 'custom,rust_doc#complete_fuzzy_result')
+    for f in found
+        if f.name == input
+            call s:open(f.path)
             return
         endif
     endfor
 
-    echomsg "No document is found for '" . a:idenfitier . "'"
+    echomsg "No document is found for '" . input . "'"
 endfunction
 
 function! rust_doc#complete_cmd(arglead, cmdline, cursorpos) abort
     let args = split(a:cmdline, '\s\+', 1)
     let len = len(args)
 
-    silent let doc = s:doc_dir(getcwd())
+    silent let doc = rust_doc#get_doc_dir(getcwd())
     if doc ==# ''
         return []
     endif
