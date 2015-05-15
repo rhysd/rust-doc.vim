@@ -19,11 +19,15 @@ For example, assume that your crate uses [rand](http://doc.rust-lang.org/rand/ra
 
 All arguments of the command can be completed.  Please enter `<Tab>` to complete them.
 
+And `:RustDocFuzzy` command is also available to search the argument fuzzily.
+
+
 - Mapping `K`
 
 Entering key `K` in your Rust source opens most corresponding document in your crate.
 
 `K` mapping is available in normal mode and visual mode.  In normal mode, the word under the cursor is used.  In visual mode, the selected text is used.
+
 
 - [unite.vim](https://github.com/Shougo/unite.vim) source
 
@@ -32,6 +36,8 @@ Entering key `K` in your Rust source opens most corresponding document in your c
 ```
 
 You can select from all document candidates in your crate with unite.vim interface.
+
+
 
 ## Installation
 
@@ -43,6 +49,8 @@ NeoBundle 'rhysd/rust-doc.vim'
 ```
 
 If you use no plugin manager, copy all directories and files in `autoload`, `plugin` and `doc` directories to your `~/.vim` directory's corresponding directories.
+
+
 
 ## Customization
 
@@ -61,6 +69,8 @@ If the value is `1`, rust-doc.vim never ask if it shows the list of modules/iden
 - `g:rust_doc#define_map_K`
 
 If the value is `1`, `K` mappings described above is defined. The default value is `1`.
+
+
 
 ## License
 
