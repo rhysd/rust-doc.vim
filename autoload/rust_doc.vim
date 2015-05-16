@@ -239,7 +239,11 @@ function! rust_doc#open_fuzzy(identifier) abort
 
     let found = []
     for i in identifiers
-        if i.name =~# '\<' . a:identifier . '\>'
+        if i.name ==# a:identifier
+            " Perfect matching opens the result instantly
+            call s:open(i.path)
+            return
+        elseif i.name =~# '\<' . a:identifier . '\>'
             let found += [i]
         endif
     endfor
