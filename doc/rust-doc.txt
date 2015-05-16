@@ -127,6 +127,8 @@ The repository of |rust-doc.vim| is hosted in GitHub.
 
 https://github.com/rhysd/rust-doc.vim
 
+You can also see the screenshots in the repository page.
+
 
 ==============================================================================
 LICENSE                                                   *rust-doc.vim-license*

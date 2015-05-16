@@ -1,7 +1,8 @@
 Open Rust document in your crate in Vim
 =======================================
 
-<!-- Screen shot here -->
+![screenshot](https://raw.githubusercontent.com/rhysd/screenshots/master/rust-doc.vim/rust-doc.vim.gif)
+![unite screenshot](https://raw.githubusercontent.com/rhysd/screenshots/master/rust-doc.vim/unite-rust-doc.gif)
 
 `cargo` has a nice feature to generate document.  But it doesn't have a feature to search it.  This plugin searches a document in your crate from Vim.
 
