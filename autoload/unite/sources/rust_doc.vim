@@ -6,9 +6,11 @@ let s:source = {
     \ 'description' : 'Rust documentation in the cargo',
     \ 'default_kind' : 'uri',
     \ 'default_action' : 'start',
+    \ 'syntax' : 'uniteSource__rust_doc',
+    \ 'hooks' : {},
     \ }
 
-function! unite#sources#rust_doc#define()
+function! unite#sources#rust_doc#define() abort
     return s:source
 endfunction
 
@@ -29,13 +31,20 @@ function! s:word_of(identifier) abort
     endif
 endfunction
 
-function! s:source.gather_candidates(args, context)
+function! s:source.gather_candidates(args, context) abort
     let doc = rust_doc#get_doc_dir(getcwd())
     let identifiers = rust_doc#get_all_module_identifiers(doc)
     return map(identifiers, '{
         \ "word" : s:word_of(v:val),
         \ "action__path" : v:val["path"],
         \ }')
+endfunction
+
+function! s:source.hooks.on_syntax(args, context) abort
+    syntax match uniteSource__rust_doc_Identifier /\%(::\)\@<=\h\w*\>\%(\s*\[\)\@=/ contained containedin=uniteSource__rust_doc display
+    syntax match uniteSource__rust_doc_Tag /\[\h\w*\]/ contained containedin=uniteSource__rust_doc display
+    highlight default link uniteSource__rust_doc_Identifier Identifier
+    highlight default link uniteSource__rust_doc_Tag Tag
 endfunction
 
 let &cpo = s:save_cpo
