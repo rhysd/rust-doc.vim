@@ -6,6 +6,7 @@ let g:rust_doc#open_cmd = get(g:, 'rust_doc#open_cmd', '')
 let g:rust_doc#do_not_ask_for_module_list = get(g:, 'rust_doc#do_not_ask_for_module_list', 0)
 let g:rust_doc#define_map_K = get(g:, 'rust_doc#define_map_K', 1)
 let g:rust_doc#downloaded_rust_doc_dir = get(g:, 'rust_doc#downloaded_rust_doc_dir', '')
+let g:rust_doc#do_not_cache = get(g:, 'rust_doc#do_not_cache', '')
 
 function! s:error(msg) abort
     echohl Error

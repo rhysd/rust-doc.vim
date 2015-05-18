@@ -1,14 +1,14 @@
-Open Rust document in your crate in Vim
+Open Rust document in Vim
 =======================================
 
 ![screenshot](https://raw.githubusercontent.com/rhysd/screenshots/master/rust-doc.vim/rust-doc.vim.gif)
 ![unite screenshot](https://raw.githubusercontent.com/rhysd/screenshots/master/rust-doc.vim/unite-rust-doc.gif)
 
-`cargo` has a nice feature to generate document.  But it doesn't have a feature to search it.  This plugin searches a document in your crate from Vim.
+`cargo` has a nice feature to generate document.  But it doesn't have a feature to search it yet.  This plugin searches documents (standard libraries, libraries your crate depends on, and so on) from Vim.
 
 ## Usage
 
-- `:RustDoc` command
+- __`:RustDoc` command__
 
 ```
 :RustDoc {crate or module name} [{identifier name}]
@@ -16,33 +16,41 @@ Open Rust document in your crate in Vim
 
 For example, assume that your crate uses [rand](http://doc.rust-lang.org/rand/rand/index.html).
 
-- `:RustDoc rand` opens the document for crate `rand`.
-- `:RustDoc rand::distributions` opens the document for module `rand::distributions`.
-- `:RustDoc rand Rng` opens the document for trait `rand::Rng`.
+1. `:RustDoc rand` opens the document for crate `rand`.
+2. `:RustDoc rand::distributions` opens the document for module `rand::distributions`.
+3. `:RustDoc rand Rng` opens the document for trait `rand::Rng`.
 
 All arguments of the command can be completed.  Please enter `<Tab>` to complete them.
+
+Of course you can search standard libraries.
+
+```
+:RustDoc std::vec
+```
 
 And `:RustDocFuzzy` command is also available to search the argument fuzzily.
 
 
-- Mapping `K`
+- __Mapping `K`__
 
-Entering key `K` in your Rust source opens a document most corresponding to a word under the cursor in your crate.
+Entering key `K` in your Rust source opens a document most corresponding to a word under the cursor.
 
 `K` mapping is available in normal mode and visual mode.  In normal mode, the word under the cursor is used.  In visual mode, the selected text is used.
 
 
-- [unite.vim](https://github.com/Shougo/unite.vim) source
+- __[unite.vim](https://github.com/Shougo/unite.vim) source__
 
 ```
 :Unite rust/doc
 ```
 
-You can select from all document candidates in your crate with unite.vim interface.
+You can select from all document candidates with unite.vim interface.
 
 
 
 ## Installation
+
+1. __Install This Plugin__
 
 If you use some plugin manager, please follow the instruction of them.
 For example, you can install this plugin with [neobundle.vim](https://github.com/Shougo/neobundle.vim) as below.
@@ -52,6 +60,25 @@ NeoBundle 'rhysd/rust-doc.vim'
 ```
 
 If you use no plugin manager, copy all directories and files in `autoload`, `plugin` and `doc` directories to your `~/.vim` directory's corresponding directories.
+
+2. __Setup Standard Library Documents__
+
+If you want to see standard library documents, you must set `g:rust_doc#downloaded_rust_doc_dir`.
+The variable should be string type and contain the path to rust documents bundled in downloaded rust tar.
+
+__e.g.__:
+
+```sh
+$ wget https://static.rust-lang.org/dist/rust-1.0.0-i686-unknown-linux-gnu.tar.gz
+$ tar xf rust-1.0.0-i686-unknown-linux-gnu.tar.gz
+$ mv rust-1.0.0-i686-unknown-linux-gnu/rust-doc ~/Documents/
+```
+
+Then set the variable as below
+
+```vim
+let g:rust_doc#downloaded_rust_doc_dir = '~/Documents/rust-doc'
+```
 
 
 
@@ -73,6 +100,9 @@ If the value is `1`, rust-doc.vim never ask if it shows the list of modules/iden
 
 If the value is `1`, `K` mappings described above is defined. The default value is `1`.
 
+- `g:rust_doc#downloaded_rust_doc_dir`
+
+As described above, the path to directory of rust standard library documents.
 
 
 ## License

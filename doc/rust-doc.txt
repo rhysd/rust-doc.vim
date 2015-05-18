@@ -1,4 +1,4 @@
-*rust-doc.txt*          Search and open Rust document in your crate from Vim.
+*rust-doc.txt*          Search and open Rust documents from Vim.
 
 Author : rhysd <lin90162@yahoo.co.jp>
 Version : 0.1
@@ -16,8 +16,9 @@ License                 |rust-doc.vim-lisence|
 ==============================================================================
 INTRODUCTION                                         *rust-doc.vim-introduction*
 
-*rust-doc.vim* searches documents in your crate and opens it by browser.  You
-can use 3 interfaces to open them.
+*rust-doc.vim* searches documents (standard libraries, libraries your crate
+depends on, and so on) and opens it by browser.  You can use 3 interfaces to
+open them.
 
 - |:RustDoc| command for detailed search
 - |K| mapping in your Rust code to search under the cursor
@@ -35,6 +36,22 @@ For example, you can install this plugin with |neobundle.vim| as below.
 Otherwise, copy all directories and files in "autoload", "plugin" and "doc"
 directories to your "~/.vim" directory's corresponding directories.
 
+If you want to see standard library documents, you must set
+|g:rust_doc#downloaded_rust_doc_dir|.  The variable should be string type and
+contain the path to rust documents directory bundled in downloaded rust tar.
+
+e.g.
+
+    1. Download documents and set it to your document directory
+>
+    $ wget https://static.rust-lang.org/dist/rust-1.0.0-i686-unknown-linux-gnu.tar.gz
+    $ tar xf rust-1.0.0-i686-unknown-linux-gnu.tar.gz
+    $ mv rust-1.0.0-i686-unknown-linux-gnu/rust-doc ~/Documents/
+<
+    2. Set |g:rust_doc#downloaded_rust_doc_dir|
+>
+    let g:rust_doc#downloaded_rust_doc_dir = '~/Documents/rust-doc'
+<
 
 ==============================================================================
 USAGE                                                       *rust-doc.vim-usage*
@@ -46,7 +63,7 @@ As described above, 3 interfaces are available.
 
     *:RustDoc* {crate-or-module} [{identifier}]            *rust-doc.vim-:RustDoc*
 
-        You can search the documents in your crate with crate name or module
+        You can search the documents with crate name or module
         name with identifier.  Identifier is a name of constant, trait, struct
         and so on.
 
@@ -62,11 +79,16 @@ As described above, 3 interfaces are available.
         (2) opens the document for module rand::distributions.
         (3) opens the document for trait rand::Rng.
 
+        Of course standard libraries documents are also available.
+>
+        :RustDoc std::vec
+<
+
     *RustDocFuzzy* {identifier}                       *rust-doc.vim-:RustDocFuzzy*
 
-        |rust-doc.vim| searches the documents in your crate with {identifier}
-        fuzzily.  It lists up all possibilities and you can select one of
-        them.  If only one candidate exists, |rust-doc.vim| opens it instantly.
+        |rust-doc.vim| searches the documents with {identifier} fuzzily.
+        It lists up all possibilities and you can select one of them.  If only
+        one candidate exists, |rust-doc.vim| opens it instantly.
 
         e.g.
 >
@@ -77,15 +99,14 @@ As described above, 3 interfaces are available.
 
 
     |rust-doc.vim| automatically overwrites default |K| mapping only in Rust
-    code.  The K mapping opens most corresponding document in your crate.
-    It is available in normal mode and visual mode.  In normal mode, the word
-    under the cursor is used.  In visual mode, the selected text is used.
+    code.  The K mapping opens most corresponding document.  It is available
+    in normal mode and visual mode.  In normal mode, the word under the cursor
+    is used.  In visual mode, the selected text is used.
 
 ------------------------------------------------------------------------------
 3. |unite.vim| source                                  *rust-doc.vim-unite-source*
 
-    You can select from all document candidates in your crate with unite.vim
-    interface.
+    You can select from all document candidates with unite.vim interface.
 >
     :Unite rust/doc
 <
@@ -118,6 +139,14 @@ g:rust_doc#define_map_K                                *g:rust_doc#define_map_K*
 
 If the value is 1, |K| mappings described above is defined.
 The default value is 1.
+
+
+g:rust_doc#downloaded_rust_doc_dir          *g:rust_doc#downloaded_rust_doc_dir*
+
+Rust tar package contains documents directory "rust-doc".  If you want to
+search the documents in it, you must set the path to the directory to this
+variable.  If the value is not empty, |rust-doc.vim| searches the documents in
+it.  The default value is "".
 
 
 ==============================================================================
