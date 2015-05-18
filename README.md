@@ -46,6 +46,11 @@ Entering key `K` in your Rust source opens a document most corresponding to a wo
 
 You can select from all document candidates with unite.vim interface.
 
+It may takes some time to prepare candidates.  If you don't want to wait and it is enough for you to search only module names, please specify `modules` to the argument of `rust/doc` source as below.
+
+```
+:Unite rust/doc:modules
+```
 
 
 ## Installation

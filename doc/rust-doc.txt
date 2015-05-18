@@ -110,6 +110,12 @@ As described above, 3 interfaces are available.
 >
     :Unite rust/doc
 <
+    It may takes some time.  If you don't want to wait and it is enough for
+    you to search only module names, please specify "modules" to the argument
+    of "rust/doc" source as below.
+>
+    :Unite rust/doc:modules
+<
 
 ==============================================================================
 VARIABLES                                               *rust-doc.vim-variables*

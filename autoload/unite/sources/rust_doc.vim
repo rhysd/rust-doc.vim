@@ -33,8 +33,12 @@ endfunction
 
 function! s:source.gather_candidates(args, context) abort
     let docs = rust_doc#get_doc_dirs(getcwd())
-    let identifiers = rust_doc#get_all_module_identifiers(docs)
-    return map(identifiers, '{
+    if index(a:args, 'modules') >= 0
+        let list = rust_doc#get_modules(docs)
+    else
+        let list = rust_doc#get_all_module_identifiers(docs)
+    endif
+    return map(list, '{
         \ "word" : s:word_of(v:val),
         \ "action__path" : v:val["path"],
         \ }')
