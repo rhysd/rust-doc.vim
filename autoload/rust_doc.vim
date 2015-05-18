@@ -35,14 +35,17 @@ function! rust_doc#find_rust_project_dir(hint) abort
     return fnamemodify(cargo, ':h')
 endfunction
 
-function! s:open(url) abort
+function! s:open(item) abort
+    echomsg printf("Hit '%s'", a:item.name)
+
+    let url = a:item.path
     if g:rust_doc#vim_open_cmd != ''
-        execute g:rust_doc#vim_open_cmd a:url
+        execute g:rust_doc#vim_open_cmd url
         return
     endif
 
     if g:rust_doc#open_cmd != ''
-        let output = system(g:rust_doc#open_cmd . ' ' . a:url)
+        let output = system(g:rust_doc#open_cmd . ' ' . url)
         if v:shell_error
             call s:error("Failed to open URL: " . output)
         endif
@@ -50,18 +53,18 @@ function! s:open(url) abort
     endif
 
     try
-        call openbrowser#open(a:url)
+        call openbrowser#open(url)
     catch /^Vim\%((\a\+)\)\=:E117/
         if has('win32') || has('win64')
-            let cmd = 'rundll32 url.dll,FileProtocolHandler ' . a:url
+            let cmd = 'rundll32 url.dll,FileProtocolHandler ' . url
         elseif executable('xdg-open') && has('unix')
-            let cmd = 'xdg-open ' . a:url
+            let cmd = 'xdg-open ' . url
         elseif executable('open') && has('mac')
-            let cmd = 'open ' . a:url
+            let cmd = 'open ' . url
         elseif executable('google-chrome')
-            let cmd = 'google-chrome ' . a:url
+            let cmd = 'google-chrome ' . url
         elseif executable('firefox')
-            let cmd = 'firefox ' . a:url
+            let cmd = 'firefox ' . url
         else
             call s:error("No command is found to open URL. Please set g:rust_doc#open_cmd")
             return
@@ -87,7 +90,7 @@ function! rust_doc#get_doc_dirs(hint) abort
         endif
     endif
 
-    let project_root = rust_doc#find_rust_project_dir(a:hint)
+    silent let project_root = rust_doc#find_rust_project_dir(a:hint)
     if project_root ==# ''
         return docs
     endif
@@ -178,6 +181,7 @@ function! s:show_module_list(modules, docs, name) abort
     endif
 
     if input("No document was found for '" . a:name . "'. Do you see the list of modules?(Y/n): ") =~? '^y\=$'
+        redraw
         for m in a:modules
             echo m.name
         endfor
@@ -188,7 +192,7 @@ function! s:open_doc(docs, name) abort
     let modules = rust_doc#get_modules(a:docs)
     for m in modules
         if m.name == a:name
-            call s:open(m.path)
+            call s:open(m)
             return
         endif
     endfor
@@ -209,6 +213,7 @@ function! s:show_identifier_list(module_name, identifiers, docs, name) abort
     endif
 
     if input("No document was found for '" . name . "'. Do you see the list of identifiers?(Y/n): ") =~? 'y\='
+        redraw
         for i in a:identifiers
             echo a:module_name . '::' . i.name
         endfor
@@ -228,7 +233,7 @@ function! s:open_doc_with_identifier(docs, name, identifier) abort
     let identifiers = rust_doc#get_identifiers(module.path)
     for i in identifiers
         if i.name == a:identifier
-            call s:open(i.path)
+            call s:open(i)
             return
         endif
     endfor
@@ -271,7 +276,7 @@ function! rust_doc#open_fuzzy(identifier) abort
     for i in identifiers
         if i.name ==# a:identifier
             " Perfect matching opens the result instantly
-            call s:open(i.path)
+            call s:open(i)
             return
         elseif i.name =~# '\<' . a:identifier . '\>'
             let found += [i]
@@ -284,15 +289,16 @@ function! rust_doc#open_fuzzy(identifier) abort
     endif
 
     if len(found) == 1
-        call s:open(found[0].path)
+        call s:open(found[0])
         return
     endif
 
     let s:last_fuzzy_candidates = join(map(copy(found), 'v:val["name"]'), "\n")
     let input = input(s:last_fuzzy_candidates . "\n\nSelect one in above list: ", '', 'custom,rust_doc#complete_fuzzy_result')
+    redraw
     for f in found
         if f.name == input
-            call s:open(f.path)
+            call s:open(f)
             return
         endif
     endfor
