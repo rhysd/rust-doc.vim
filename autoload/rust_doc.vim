@@ -6,7 +6,7 @@ let g:rust_doc#open_cmd = get(g:, 'rust_doc#open_cmd', '')
 let g:rust_doc#do_not_ask_for_module_list = get(g:, 'rust_doc#do_not_ask_for_module_list', 0)
 let g:rust_doc#define_map_K = get(g:, 'rust_doc#define_map_K', 1)
 let g:rust_doc#downloaded_rust_doc_dir = get(g:, 'rust_doc#downloaded_rust_doc_dir', '')
-let g:rust_doc#do_not_cache = get(g:, 'rust_doc#do_not_cache', '')
+let g:rust_doc#show_result_in_vim = get(g:, 'rust_doc#show_result_in_vim', 0)
 
 function! s:error(msg) abort
     echohl Error
@@ -35,10 +35,46 @@ function! rust_doc#find_rust_project_dir(hint) abort
     return fnamemodify(cargo, ':h')
 endfunction
 
+function! s:open_in_vim(url) abort
+        if !executable('html2text')
+            call s:error("'html2text' command is required to show the result in Vim.  Fall back.")
+            return 0
+        end
+
+        let cmd = 'html2text ' . shellescape(a:url)
+
+        let document = system(cmd)
+        if v:shell_error
+            call s:error(string(cmd) . " failed: " . document)
+            return 0
+        endif
+
+        setlocal bufhidden=delete
+        setlocal buftype=nofile
+        setlocal noswapfile
+        setlocal nobuflisted
+        setlocal filetype=text
+
+        setlocal modifiable
+        %delete _
+        call append(0, split(document, "\n"))
+        sil $delete _
+        setlocal nomodifiable
+
+        return 1
+endfunction
+
 function! s:open(item) abort
     echomsg printf("Hit '%s'", a:item.name)
 
     let url = a:item.path
+
+    if g:rust_doc#show_result_in_vim
+        if s:open_in_vim(url)
+            return
+        endif
+    endif
+
     if g:rust_doc#vim_open_cmd != ''
         execute g:rust_doc#vim_open_cmd url
         return
@@ -75,9 +111,6 @@ function! s:open(item) abort
             call s:error("Failed to open URL: " . output)
         endif
     endtry
-
-    " TODO
-    " Open the url in Vim via html2text
 endfunction
 
 function! rust_doc#get_doc_dirs(hint) abort
