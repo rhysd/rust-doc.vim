@@ -32,8 +32,8 @@ function! s:word_of(identifier) abort
 endfunction
 
 function! s:source.gather_candidates(args, context) abort
-    let doc = rust_doc#get_doc_dir(getcwd())
-    let identifiers = rust_doc#get_all_module_identifiers(doc)
+    let docs = rust_doc#get_doc_dirs(getcwd())
+    let identifiers = rust_doc#get_all_module_identifiers(docs)
     return map(identifiers, '{
         \ "word" : s:word_of(v:val),
         \ "action__path" : v:val["path"],
