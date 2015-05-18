@@ -55,7 +55,7 @@ It may takes some time to prepare candidates.  If you don't want to wait and it 
 
 ## Installation
 
-1. __Install This Plugin__
+### 1. Install This Plugin
 
 If you use some plugin manager, please follow the instruction of them.
 For example, you can install this plugin with [neobundle.vim](https://github.com/Shougo/neobundle.vim) as below.
@@ -66,7 +66,7 @@ NeoBundle 'rhysd/rust-doc.vim'
 
 If you use no plugin manager, copy all directories and files in `autoload`, `plugin` and `doc` directories to your `~/.vim` directory's corresponding directories.
 
-2. __Setup Standard Library Documents__
+### 2. Setup Standard Library Documents
 
 If you want to see standard library documents, you must set `g:rust_doc#downloaded_rust_doc_dir`.
 The variable should be string type and contain the path to rust documents bundled in downloaded rust tar.
