@@ -38,7 +38,7 @@ endfunction
 function! s:open(item) abort
     echomsg printf("Hit '%s'", a:item.name)
 
-    let url = a:item.path
+    let url = shellescape(a:item.path)
     if g:rust_doc#vim_open_cmd != ''
         execute g:rust_doc#vim_open_cmd url
         return
