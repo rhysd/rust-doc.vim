@@ -32,7 +32,8 @@ function! s:word_of(identifier) abort
 endfunction
 
 function! s:source.gather_candidates(args, context) abort
-    let docs = rust_doc#get_doc_dirs(getcwd())
+    let hint_dir = expand('%:p:h')
+    let docs = rust_doc#get_doc_dirs(hint_dir !=# '' ? hint_dir : getcwd())
     if index(a:args, 'modules') >= 0
         let list = rust_doc#get_modules(docs)
     else

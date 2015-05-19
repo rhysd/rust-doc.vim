@@ -6,12 +6,16 @@ let g:rust_doc#open_cmd = get(g:, 'rust_doc#open_cmd', '')
 let g:rust_doc#do_not_ask_for_module_list = get(g:, 'rust_doc#do_not_ask_for_module_list', 0)
 let g:rust_doc#define_map_K = get(g:, 'rust_doc#define_map_K', 1)
 let g:rust_doc#downloaded_rust_doc_dir = get(g:, 'rust_doc#downloaded_rust_doc_dir', '')
-let g:rust_doc#do_not_cache = get(g:, 'rust_doc#do_not_cache', '')
 
 function! s:error(msg) abort
     echohl Error
     echomsg "rust-doc-open: " . a:msg
     echohl None
+endfunction
+
+function! s:get_hint() abort
+    let d = expand('%:p:h')
+    return d !=# '' ? d : getcwd()
 endfunction
 
 function! rust_doc#find_rust_project_dir(hint) abort
@@ -36,7 +40,7 @@ function! rust_doc#find_rust_project_dir(hint) abort
 endfunction
 
 function! s:open(item) abort
-    echomsg printf("Hit '%s'", a:item.name)
+    echomsg printf("'%s' is found", a:item.name)
 
     let url = shellescape(a:item.path)
     if g:rust_doc#vim_open_cmd != ''
@@ -75,9 +79,6 @@ function! s:open(item) abort
             call s:error("Failed to open URL: " . output)
         endif
     endtry
-
-    " TODO
-    " Open the url in Vim via html2text
 endfunction
 
 function! rust_doc#get_doc_dirs(hint) abort
@@ -242,10 +243,7 @@ function! s:open_doc_with_identifier(docs, name, identifier) abort
 endfunction
 
 function! rust_doc#open(...) abort
-    let docs = rust_doc#get_doc_dirs(getcwd())
-    if docs ==# []
-        return
-    endif
+    let docs = rust_doc#get_doc_dirs(s:get_hint())
 
     if a:0 == 1
         call s:open_doc(docs, a:1)
@@ -265,10 +263,7 @@ function! rust_doc#complete_fuzzy_result(...) abort
 endfunction
 
 function! rust_doc#open_fuzzy(identifier) abort
-    let docs = rust_doc#get_doc_dirs(getcwd())
-    if docs ==# []
-        return
-    endif
+    let docs = rust_doc#get_doc_dirs(s:get_hint())
 
     let identifiers = rust_doc#get_all_module_identifiers(docs)
 
@@ -295,6 +290,7 @@ function! rust_doc#open_fuzzy(identifier) abort
 
     let s:last_fuzzy_candidates = join(map(copy(found), 'v:val["name"]'), "\n")
     let input = input(s:last_fuzzy_candidates . "\n\nSelect one in above list: ", '', 'custom,rust_doc#complete_fuzzy_result')
+    unlet! s:last_fuzzy_candidates
     redraw
     for f in found
         if f.name == input
@@ -310,10 +306,7 @@ function! rust_doc#complete_cmd(arglead, cmdline, cursorpos) abort
     let args = split(a:cmdline, '\s\+', 1)
     let len = len(args)
 
-    silent let docs = rust_doc#get_doc_dirs(getcwd())
-    if docs ==# []
-        return []
-    endif
+    silent let docs = rust_doc#get_doc_dirs(s:get_hint())
 
     if len == 2
         " Complete module name
