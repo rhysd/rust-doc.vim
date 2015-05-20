@@ -84,7 +84,7 @@ As described above, 3 interfaces are available.
         :RustDoc std::vec
 <
 
-    *RustDocFuzzy* {identifier}                       *rust-doc.vim-:RustDocFuzzy*
+    *:RustDocFuzzy* {identifier}                      *rust-doc.vim-:RustDocFuzzy*
 
         |rust-doc.vim| searches the documents with {identifier} fuzzily.
         It lists up all possibilities and you can select one of them.  If only
@@ -94,6 +94,19 @@ As described above, 3 interfaces are available.
 >
         :RustDocFuzzy distributions
 <
+
+    *:RustDocModule* {name}                          *rust-doc.vim-:RustDocModule*
+
+        It searches the name of modules with {name}.
+        If only one candidate is found, |rust-doc.vim| opens the document
+        instantly.  Otherwise, it lists up all candidates and you can select
+        on of them.
+
+        e.g.
+>
+        :RustDocModule std::io
+<
+
 ------------------------------------------------------------------------------
 2. |K| mapping in your Rust code                          *rust-doc.vim-K-mapping*
 

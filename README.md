@@ -28,7 +28,7 @@ Of course you can search standard libraries.
 :RustDoc std::vec
 ```
 
-And `:RustDocFuzzy` command is also available to search the argument fuzzily.
+And `:RustDocFuzzy` and `:RustDocModule` are also available.  Please see [document for them](https://github.com/rhysd/rust-doc.vim/blob/master/doc/rust-doc.txt) for more detail.
 
 
 - __Mapping `K`__

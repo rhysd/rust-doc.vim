@@ -3,7 +3,7 @@ set cpo&vim
 
 let s:source = {
     \ 'name' : 'rust/doc',
-    \ 'description' : 'Rust documentation in the cargo',
+    \ 'description' : 'Rust documentation',
     \ 'default_kind' : 'uri',
     \ 'default_action' : 'start',
     \ 'syntax' : 'uniteSource__rust_doc',

@@ -40,7 +40,7 @@ function! rust_doc#find_rust_project_dir(hint) abort
 endfunction
 
 function! s:open(item) abort
-    echomsg printf("'%s' is found", a:item.name)
+    echomsg printf("rust-doc: '%s' is found", a:item.name)
 
     let url = shellescape(a:item.path)
     if g:rust_doc#vim_open_cmd != ''
@@ -177,7 +177,7 @@ function! s:show_module_list(modules, docs, name) abort
     endif
 
     if empty(a:modules)
-        echomsg "No module is found"
+        echomsg "rust-doc: No module is found"
         return
     endif
 
@@ -209,7 +209,7 @@ function! s:show_identifier_list(module_name, identifiers, docs, name) abort
     endif
 
     if empty(a:identifiers)
-        echomsg "No identifier is found in " . a:module_name
+        echomsg "rust-doc: No identifier is found in " . a:module_name
         return
     endif
 
@@ -262,24 +262,20 @@ function! rust_doc#complete_fuzzy_result(...) abort
     endif
 endfunction
 
-function! rust_doc#open_fuzzy(identifier) abort
-    let docs = rust_doc#get_doc_dirs(s:get_hint())
-
-    let identifiers = rust_doc#get_all_module_identifiers(docs)
-
+function! s:open_fuzzy(candidates, name) abort
     let found = []
-    for i in identifiers
-        if i.name ==# a:identifier
+    for c in a:candidates
+        if c.name ==# a:name
             " Perfect matching opens the result instantly
-            call s:open(i)
+            call s:open(c)
             return
-        elseif i.name =~# '\<' . a:identifier . '\>'
-            let found += [i]
+        elseif c.name =~# '\<' . a:name . '\>'
+            let found += [c]
         endif
     endfor
 
     if empty(found)
-        echomsg "No document is found for '" . a:identifier . "'"
+        echomsg "rust-doc: No document is found for '" . a:name . "'"
         return
     endif
 
@@ -299,7 +295,19 @@ function! rust_doc#open_fuzzy(identifier) abort
         endif
     endfor
 
-    echomsg "No document is found for '" . input . "'"
+    echomsg "rust-doc: No document is found for '" . input . "'"
+endfunction
+
+function! rust_doc#open_fuzzy(identifier) abort
+    let docs = rust_doc#get_doc_dirs(s:get_hint())
+    let identifiers = rust_doc#get_all_module_identifiers(docs)
+    call s:open_fuzzy(identifiers, a:identifier)
+endfunction
+
+function! rust_doc#open_module(name) abort
+    let docs = rust_doc#get_doc_dirs(s:get_hint())
+    let modules = rust_doc#get_modules(docs)
+    call s:open_fuzzy(modules, a:name)
 endfunction
 
 function! rust_doc#complete_cmd(arglead, cmdline, cursorpos) abort
@@ -330,6 +338,22 @@ function! rust_doc#complete_cmd(arglead, cmdline, cursorpos) abort
     endif
 
     return []
+endfunction
+
+function! rust_doc#complete_module_cmd(arglead, cmdline, cursorpos) abort
+    let args = split(a:cmdline, '\s\+', 1)
+
+    silent let docs = rust_doc#get_doc_dirs(s:get_hint())
+
+    if len(args) != 2
+        return []
+    endif
+
+    let candidates = map(rust_doc#get_modules(docs), 'v:val["name"]')
+    if args[1] !=# ''
+        let candidates = filter(candidates, 'stridx(v:val, args[1]) == 0')
+    endif
+    return sort(candidates)
 endfunction
 
 let &cpo = s:save_cpo
