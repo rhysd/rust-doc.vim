@@ -82,7 +82,7 @@ $ mv rust-1.0.0-i686-unknown-linux-gnu/rust-doc ~/Documents/
 Then set the variable as below
 
 ```vim
-let g:rust_doc#downloaded_rust_doc_dir = '~/Documents/rust-doc'
+let g:rust_doc#downloaded_rust_doc_dir = '~/Documents/rust-docs'
 ```
 
 

@@ -50,7 +50,7 @@ e.g.
 <
     2. Set |g:rust_doc#downloaded_rust_doc_dir|
 >
-    let g:rust_doc#downloaded_rust_doc_dir = '~/Documents/rust-doc'
+    let g:rust_doc#downloaded_rust_doc_dir = '~/Documents/rust-docs'
 <
 
 ==============================================================================
