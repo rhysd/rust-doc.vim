@@ -118,7 +118,7 @@ function! rust_doc#get_doc_dirs(hint) abort
     return docs
 endfunction
 
-if v:version > 703 || (v:version == 703 && has('patch465'))
+if v:version > 704 || (v:version == 704 && has('patch279'))
     function! s:globpath(dir, pattern) abort
         return globpath(a:dir, a:pattern, 1, 1)
     endfunction
