@@ -284,10 +284,14 @@ function! s:open_fuzzy(candidates, name) abort
         return
     endif
 
-    let s:last_fuzzy_candidates = join(map(copy(found), 'v:val["name"]'), "\n")
-    let input = input(s:last_fuzzy_candidates . "\n\nSelect one in above list: ", '', 'custom,rust_doc#complete_fuzzy_result')
+    let s:last_fuzzy_candidates = join(map(copy(found), 'v:key.": ".v:val["name"]'), "\n")
+    let input = input(s:last_fuzzy_candidates . "\n\nSelect number or name in above list: ", '', 'custom,rust_doc#complete_fuzzy_result')
     unlet! s:last_fuzzy_candidates
     redraw
+    if input =~ '\v^[0-9]+$' && input >= 0 && input < len(found)
+        call s:open(found[input])
+        return
+    endif
     for f in found
         if f.name == input
             call s:open(f)
