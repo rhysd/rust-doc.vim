@@ -18,6 +18,26 @@ function! s:get_hint() abort
     return d !=# '' ? d : getcwd()
 endfunction
 
+function! rust_doc#find_std_doc_dir() abort
+    let d = ''
+    if g:rust_doc#downloaded_rust_doc_dir !=# '' && isdirectory(g:rust_doc#downloaded_rust_doc_dir)
+        let d = g:rust_doc#downloaded_rust_doc_dir
+    endif
+    let rustup = expand('~/.rustup/toolchains/')
+    if isdirectory(rustup)
+        let toolchains = s:globpath(rustup, '*')
+        let dirs = filter(toolchains, 'stridx(v:val, "stable-") >= 0')
+        if empty(dirs)
+            " Fallback to nightly
+            let dirs = filter(toolchains, 'stridx(v:val, "nightly-") >= 0')
+        endif
+        if !empty(dirs)
+            let d = dirs[0]
+        endif
+    endif
+    return d . '/share/doc/rust/html/'
+endfunction
+
 function! rust_doc#find_rust_project_dir(hint) abort
     let path = fnamemodify(a:hint, ':p')
     if filereadable(path)
@@ -39,19 +59,43 @@ function! rust_doc#find_rust_project_dir(hint) abort
     return fnamemodify(cargo, ':h')
 endfunction
 
+function! s:open_url(url) abort
+    let url = shellescape(a:url)
+    if has('win32') || has('win64')
+        let cmd = 'rundll32 url.dll,FileProtocolHandler ' . url
+    elseif executable('xdg-open') && has('unix')
+        let cmd = 'xdg-open ' . url
+    elseif executable('open') && has('mac')
+        let cmd = 'open ' . url
+    elseif executable('google-chrome')
+        let cmd = 'google-chrome ' . url
+    elseif executable('firefox')
+        let cmd = 'firefox ' . url
+    else
+        call s:error('No command is found to open URL. Please set g:rust_doc#open_cmd')
+        return
+    endif
+
+    let output = system(cmd)
+    if v:shell_error
+        call s:error('Failed to open ' . a:url . ': ' . output)
+        return
+    endif
+endfunction
+
 function! s:open(item) abort
     echomsg printf("rust-doc: '%s' is found", a:item.name)
 
-    let url = shellescape(a:item.path)
-    if g:rust_doc#vim_open_cmd != ''
+    let url = 'file://' . a:item.path
+    if g:rust_doc#vim_open_cmd !=# ''
         execute g:rust_doc#vim_open_cmd url
         return
     endif
 
-    if g:rust_doc#open_cmd != ''
+    if g:rust_doc#open_cmd !=# ''
         let output = system(g:rust_doc#open_cmd . ' ' . url)
         if v:shell_error
-            call s:error("Failed to open URL: " . output)
+            call s:error('Failed to open URL: ' . output)
         endif
         return
     endif
@@ -59,25 +103,7 @@ function! s:open(item) abort
     try
         call openbrowser#open(url)
     catch /^Vim\%((\a\+)\)\=:E117/
-        if has('win32') || has('win64')
-            let cmd = 'rundll32 url.dll,FileProtocolHandler ' . url
-        elseif executable('xdg-open') && has('unix')
-            let cmd = 'xdg-open ' . url
-        elseif executable('open') && has('mac')
-            let cmd = 'open ' . url
-        elseif executable('google-chrome')
-            let cmd = 'google-chrome ' . url
-        elseif executable('firefox')
-            let cmd = 'firefox ' . url
-        else
-            call s:error('No command is found to open URL. Please set g:rust_doc#open_cmd')
-            return
-        endif
-
-        let output = system(cmd)
-        if v:shell_error
-            call s:error('Failed to open URL: ' . output)
-        endif
+        call s:open_url(url)
     endtry
 endfunction
 
@@ -85,7 +111,7 @@ function! rust_doc#get_doc_dirs(hint) abort
     let docs = []
 
     if g:rust_doc#downloaded_rust_doc_dir !=# ''
-        let d = expand(g:rust_doc#downloaded_rust_doc_dir . '/share/doc/rust/html/')
+        let d = rust_doc#find_std_doc_dir()
         if isdirectory(d)
             let docs += [d]
         endif
@@ -177,7 +203,7 @@ function! s:show_module_list(modules, docs, name) abort
     endif
 
     if empty(a:modules)
-        echomsg "rust-doc: No module is found"
+        echomsg 'rust-doc: No module is found'
         return
     endif
 
@@ -275,7 +301,7 @@ function! s:open_fuzzy(candidates, name) abort
     endfor
 
     if empty(found)
-        echomsg 'rust-doc: No document is found for '' . a:name . '''
+        echomsg "rust-doc: No document is found for '" . a:name . "'"
         return
     endif
 
@@ -284,7 +310,7 @@ function! s:open_fuzzy(candidates, name) abort
         return
     endif
 
-    let s:last_fuzzy_candidates = join(map(copy(found), 'v:key.": ".v:val["name"]'), "\n")
+    let s:last_fuzzy_candidates = join(map(copy(found), 'v:key . ": ".v:val["name"]'), "\n")
     let input = input(s:last_fuzzy_candidates . "\n\nSelect number or name in above list: ", '', 'custom,rust_doc#complete_fuzzy_result')
     unlet! s:last_fuzzy_candidates
     redraw
