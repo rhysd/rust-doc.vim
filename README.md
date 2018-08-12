@@ -1,10 +1,11 @@
 Open Rust document in Vim
-=======================================
+=========================
 
 ![screenshot](https://raw.githubusercontent.com/rhysd/screenshots/master/rust-doc.vim/rust-doc.vim.gif)
 ![unite screenshot](https://raw.githubusercontent.com/rhysd/screenshots/master/rust-doc.vim/unite-rust-doc.gif)
 
-`cargo` has a nice feature to generate document.  But it doesn't have a feature to search it yet.  This plugin searches documents (standard libraries, libraries your crate depends on, and so on) from Vim.
+`cargo` has a nice feature to generate document.  But it doesn't have a feature to search it yet.
+This plugin searches documents (standard libraries, libraries your crate depends on, and so on) from Vim.
 
 ## Usage
 
@@ -66,9 +67,13 @@ NeoBundle 'rhysd/rust-doc.vim'
 
 If you use no plugin manager, copy all directories and files in `autoload`, `plugin` and `doc` directories to your `~/.vim` directory's corresponding directories.
 
-### 2. Setup Standard Library Documents
+### 2. (Optional) Setup Standard Library Documents
 
-If you want to see standard library documents, you must set `g:rust_doc#downloaded_rust_doc_dir`.
+rust-doc.vim searches documents downloaded by [rustup](https://github.com/rust-lang-nursery/rustup.rs).
+If there is a toolchain installed by rustup, rust-doc.vim tries to use documentations in it.
+Stable toolchain is used by default with falling back to nightly toolchain.
+
+If you want to see your own standard library documents, you must set `g:rust_doc#downloaded_rust_doc_dir`.
 The variable should be string type and contain the path to rust documents bundled in downloaded rust tar.
 
 __e.g.__:
