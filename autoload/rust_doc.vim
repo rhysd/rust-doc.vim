@@ -9,7 +9,7 @@ let g:rust_doc#downloaded_rust_doc_dir = get(g:, 'rust_doc#downloaded_rust_doc_d
 
 function! s:error(msg) abort
     echohl Error
-    echomsg "rust-doc-open: " . a:msg
+    echomsg 'rust-doc-open: ' . a:msg
     echohl None
 endfunction
 
@@ -25,14 +25,14 @@ function! rust_doc#find_rust_project_dir(hint) abort
     endif
 
     if !isdirectory(path)
-        call s:error("Invalid path: " . a:hint)
+        call s:error('Invalid path: ' . a:hint)
         return ''
     endif
 
     let cargo = findfile('Cargo.toml', path . ';')
 
     if cargo ==# ''
-        call s:error("Cargo.toml is not found")
+        call s:error('Cargo.toml is not found')
         return ''
     endif
 
@@ -70,13 +70,13 @@ function! s:open(item) abort
         elseif executable('firefox')
             let cmd = 'firefox ' . url
         else
-            call s:error("No command is found to open URL. Please set g:rust_doc#open_cmd")
+            call s:error('No command is found to open URL. Please set g:rust_doc#open_cmd')
             return
         endif
 
         let output = system(cmd)
         if v:shell_error
-            call s:error("Failed to open URL: " . output)
+            call s:error('Failed to open URL: ' . output)
         endif
     endtry
 endfunction
@@ -102,13 +102,13 @@ function! rust_doc#get_doc_dirs(hint) abort
         echom "'doc' directory is not found. Executing `cargo doc`..."
         !cargo doc
         if v:shell_error
-            call s:error("`cargo doc` failed.  Do it manually.")
+            call s:error('`cargo doc` failed.  Do it manually.')
             return []
         endif
     endif
 
     if !isdirectory(d)
-        call s:error("Document directory is not found")
+        call s:error('Document directory is not found')
         return []
     endif
 
@@ -209,7 +209,7 @@ function! s:show_identifier_list(module_name, identifiers, docs, name) abort
     endif
 
     if empty(a:identifiers)
-        echomsg "rust-doc: No identifier is found in " . a:module_name
+        echomsg 'rust-doc: No identifier is found in ' . a:module_name
         return
     endif
 
@@ -250,7 +250,7 @@ function! rust_doc#open(...) abort
     elseif a:0 == 2
         call s:open_doc_with_identifier(docs, a:1, a:2)
     else
-        call s:error("Wrong number of argument(s): " . a:0 . " for 1 or 2")
+        call s:error('Wrong number of argument(s): ' . a:0 . ' for 1 or 2')
     endif
 endfunction
 
@@ -275,7 +275,7 @@ function! s:open_fuzzy(candidates, name) abort
     endfor
 
     if empty(found)
-        echomsg "rust-doc: No document is found for '" . a:name . "'"
+        echomsg 'rust-doc: No document is found for '' . a:name . '''
         return
     endif
 
@@ -288,7 +288,7 @@ function! s:open_fuzzy(candidates, name) abort
     let input = input(s:last_fuzzy_candidates . "\n\nSelect number or name in above list: ", '', 'custom,rust_doc#complete_fuzzy_result')
     unlet! s:last_fuzzy_candidates
     redraw
-    if input =~ '\v^[0-9]+$' && input >= 0 && input < len(found)
+    if input =~# '\v^[0-9]+$' && input >= 0 && input < len(found)
         call s:open(found[input])
         return
     endif
@@ -332,7 +332,7 @@ function! rust_doc#complete_cmd(arglead, cmdline, cursorpos) abort
         for m in rust_doc#get_modules(docs)
             if m.name == args[1]
                 let candidates = map(rust_doc#get_identifiers(m.path), 'v:val["name"]')
-                if args[2] != ''
+                if args[2] !=# ''
                     let candidates = filter(candidates, 'stridx(v:val, args[2]) == 0')
                 endif
                 return sort(candidates)

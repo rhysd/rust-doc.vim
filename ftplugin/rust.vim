@@ -1,7 +1,7 @@
 if g:rust_doc#define_map_K
     function! s:search_under_cursor(query) range
         if a:query ==# ''
-            echomsg "rust-doc: No identifier is found under the cursor"
+            echomsg 'rust-doc: No identifier is found under the cursor'
             return
         endif
 
