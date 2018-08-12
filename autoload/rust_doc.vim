@@ -24,15 +24,15 @@ function! rust_doc#find_std_doc_dir() abort
         let d = g:rust_doc#downloaded_rust_doc_dir
     endif
     if executable('rustup')
-        let rustup_doc_index = substitute(system('rustup doc --path'), '\n$', '', '')
-        if !v:shell_error
-            return fnamemodify(rustup_doc_index, ':h')
+        let index_html = substitute(system('rustup doc --path'), '\n$', '', '')
+        if !v:shell_error && filereadable(index_html)
+            return fnamemodify(index_html, ':h')
         endif
     endif
     let toolchains_dir = expand('~/.rustup/toolchains/')
     if isdirectory(toolchains_dir)
         let toolchains = s:globpath(toolchains_dir, '*')
-        let dirs = filter(toolchains, 'stridx(v:val, "stable-") >= 0')
+        let dirs = filter(copy(toolchains), 'stridx(v:val, "stable-") >= 0')
         if empty(dirs)
             " Fallback to nightly
             let dirs = filter(toolchains, 'stridx(v:val, "nightly-") >= 0')
