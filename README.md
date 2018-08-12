@@ -29,14 +29,16 @@ Of course you can search standard libraries.
 :RustDoc std::vec
 ```
 
-And `:RustDocFuzzy` and `:RustDocModule` are also available.  Please see [document for them](https://github.com/rhysd/rust-doc.vim/blob/master/doc/rust-doc.txt) for more detail.
+And `:RustDocFuzzy` and `:RustDocModule` are also available.
+Please see [document for them](https://github.com/rhysd/rust-doc.vim/blob/master/doc/rust-doc.txt) for more detail.
 
 
 - __Mapping `K`__
 
 Entering key `K` in your Rust source opens a document most corresponding to a word under the cursor.
 
-`K` mapping is available in normal mode and visual mode.  In normal mode, the word under the cursor is used.  In visual mode, the selected text is used.
+`K` mapping is available in normal mode and visual mode.  In normal mode, the word under the cursor is used.
+In visual mode, the selected text is used.
 
 
 - __[unite.vim](https://github.com/Shougo/unite.vim) source__
@@ -47,7 +49,8 @@ Entering key `K` in your Rust source opens a document most corresponding to a wo
 
 You can select from all document candidates with unite.vim interface.
 
-It may takes some time to prepare candidates.  If you don't want to wait and it is enough for you to search only module names, please specify `modules` to the argument of `rust/doc` source as below.
+It may takes some time to prepare candidates.  If you don't want to wait and it is enough for you to search only module names,
+please specify `modules` to the argument of `rust/doc` source as below.
 
 ```
 :Unite rust/doc:modules
@@ -65,13 +68,15 @@ For example, you can install this plugin with [neobundle.vim](https://github.com
 NeoBundle 'rhysd/rust-doc.vim'
 ```
 
-If you use no plugin manager, copy all directories and files in `autoload`, `plugin` and `doc` directories to your `~/.vim` directory's corresponding directories.
+If you use no plugin manager, copy all directories and files in `autoload`, `plugin`, `ftplugin`
+and `doc` directories to your `~/.vim` directory's corresponding directories.
+
+Or you can also use Vim's standard package management. Please read `:help packages`.
 
 ### 2. (Optional) Setup Standard Library Documents
 
 rust-doc.vim searches documents downloaded by [rustup](https://github.com/rust-lang-nursery/rustup.rs).
 If there is a toolchain installed by rustup, rust-doc.vim tries to use documentations in it.
-Stable toolchain is used by default with falling back to nightly toolchain.
 
 If you want to see your own standard library documents, you must set `g:rust_doc#downloaded_rust_doc_dir`.
 The variable should be string type and contain the path to rust documents bundled in downloaded rust tar.
@@ -91,20 +96,22 @@ let g:rust_doc#downloaded_rust_doc_dir = '~/Documents/rust-docs'
 ```
 
 
-
 ## Customization
 
 - `g:rust_doc#vim_open_cmd`
 
-Vim command to open the path to a document.  rust-doc.vim uses it to open the document if it is not empty.  The command must take a url to the local file.
+Vim command to open the path to a document.  rust-doc.vim uses it to open the document if it is not empty.
+The command must take a url to the local file.
 
 - `g:rust_doc#open_cmd`
 
-Shell command to open the path to a document.  rust-doc.vim uses it to open the document if it is not empty.  The command must take a url to the local file.
+Shell command to open the path to a document.  rust-doc.vim uses it to open the document if it is not empty.
+The command must take a url to the local file.
 
 - `g:rust_doc#do_not_ask_for_module_list`
 
-If the value is `1`, rust-doc.vim never ask if it shows the list of modules/identifiers when no document is found. The default value is `0`.
+If the value is `1`, rust-doc.vim never ask if it shows the list of modules/identifiers when no document is found.
+The default value is `0`.
 
 - `g:rust_doc#define_map_K`
 

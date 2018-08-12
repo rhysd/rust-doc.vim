@@ -36,9 +36,11 @@ For example, you can install this plugin with |neobundle.vim| as below.
 Otherwise, copy all directories and files in "autoload", "plugin" and "doc"
 directories to your "~/.vim" directory's corresponding directories.
 
-If you want to see standard library documents, you must set
-|g:rust_doc#downloaded_rust_doc_dir|.  The variable should be string type and
-contain the path to rust documents directory bundled in downloaded rust tar.
+(Optional)
+By default, rust-doc.vim searches documents installed by rustup.  If you want
+to see your own standard library documents downloaded to elsewhere, you must
+set |g:rust_doc#downloaded_rust_doc_dir|.  The variable should be string type
+and contain the path to downloaded rust documents directory.
 
 e.g.
 
