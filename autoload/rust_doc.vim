@@ -99,9 +99,10 @@ function! s:open(item) abort
     endif
 
     if g:rust_doc#open_cmd !=# ''
-        let output = system(g:rust_doc#open_cmd . ' ' . url)
+        let cmd = g:rust_doc#open_cmd . ' ' . shellescape(url)
+        let output = system(cmd)
         if v:shell_error
-            call s:error('Failed to open URL: ' . output)
+            call s:error(printf("Failed to open URL '%s' with command '%s': %s", url, cmd, output))
         endif
         return
     endif
