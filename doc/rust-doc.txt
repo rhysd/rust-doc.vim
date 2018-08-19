@@ -125,6 +125,16 @@ As described above, 3 interfaces are available.
 >
     :Unite rust/doc
 <
+    If you want to use unite.vim for `K` mapping, you can setup in your vimrc as
+    follows.
+>
+    let g:rust_doc#define_map_K = 0
+    augroup vimrc-rust
+        autocmd!
+        autocmd FileType rust nnoremap <buffer><silent>K :<C-u>Unite rust/doc:cursor -no-empty -immediately
+        autocmd FileType rust vnoremap <buffer><silent>K :Unite rust/doc:visual -no-empty -immediately
+    augroup END
+<
     It may takes some time.  If you don't want to wait and it is enough for
     you to search only module names, please specify "modules" to the argument
     of "rust/doc" source as below.

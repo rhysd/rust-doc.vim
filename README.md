@@ -48,6 +48,16 @@ In visual mode, the selected text is used.
 ```
 
 You can select from all document candidates with unite.vim interface.
+And if you want to use unite.vim for `K` mapping, you can setup in your vimrc as follows.
+
+```vim
+let g:rust_doc#define_map_K = 0
+augroup vimrc-rust
+    autocmd!
+    autocmd FileType rust nnoremap <buffer><silent>K :<C-u>Unite rust/doc:cursor -no-empty -immediately<CR>
+    autocmd FileType rust vnoremap <buffer><silent>K :Unite rust/doc:visual -no-empty -immediately<CR>
+augroup END
+```
 
 It may takes some time to prepare candidates.  If you don't want to wait and it is enough for you to search only module names,
 please specify `modules` to the argument of `rust/doc` source as below.
@@ -55,7 +65,6 @@ please specify `modules` to the argument of `rust/doc` source as below.
 ```
 :Unite rust/doc:modules
 ```
-
 
 ## Installation
 
