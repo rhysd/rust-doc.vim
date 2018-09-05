@@ -1,11 +1,16 @@
 Open Rust document in Vim
 =========================
 
-![screenshot](https://raw.githubusercontent.com/rhysd/screenshots/master/rust-doc.vim/rust-doc.vim.gif)
-![unite screenshot](https://raw.githubusercontent.com/rhysd/screenshots/master/rust-doc.vim/unite-rust-doc.gif)
-
 `cargo` has a nice feature to generate document.  But it doesn't have a feature to search it yet.
 This plugin searches documents (standard libraries, libraries your crate depends on, and so on) from Vim.
+
+- Open a document for the word under cursor `std`
+
+![screenshot](https://raw.githubusercontent.com/rhysd/screenshots/master/rust-doc.vim/rust-doc.vim.gif)
+
+- Search documents with [unit.vim](https://github.com/Shougo/unite.vim) interface
+
+![unite screenshot](https://raw.githubusercontent.com/rhysd/screenshots/master/rust-doc.vim/unite-rust-doc.gif)
 
 ## Usage
 
