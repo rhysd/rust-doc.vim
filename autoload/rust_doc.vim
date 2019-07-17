@@ -92,7 +92,7 @@ endfunction
 function! s:open(item) abort
     echomsg printf("rust-doc: '%s' is found", a:item.name)
 
-    let url = 'file://' . a:item.path
+    let url = 'file://' . fnamemodify(a:item.path, ':p')
     if g:rust_doc#vim_open_cmd !=# ''
         execute g:rust_doc#vim_open_cmd url
         return
