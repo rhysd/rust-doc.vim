@@ -114,6 +114,29 @@ function! s:open(item) abort
     endtry
 endfunction
 
+function! rust_doc#open_denite(path) abort
+    let url = 'file://' . fnamemodify(a:path, ':p')
+    if g:rust_doc#vim_open_cmd !=# ''
+        execute g:rust_doc#vim_open_cmd url
+        return
+    endif
+
+    if g:rust_doc#open_cmd !=# ''
+        let cmd = g:rust_doc#open_cmd . ' ' . shellescape(url)
+        let output = system(cmd)
+        if v:shell_error
+            call s:error(printf("Failed to open URL '%s' with command '%s': %s", url, cmd, output))
+        endif
+        return
+    endif
+
+    try
+        call openbrowser#open(url)
+    catch /^Vim\%((\a\+)\)\=:E117/
+        call s:open_url(url)
+    endtry
+endfunction
+
 function! rust_doc#get_doc_dirs(hint) abort
     let docs = []
 
