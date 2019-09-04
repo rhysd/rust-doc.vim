@@ -58,7 +58,7 @@ e.g.
 ==============================================================================
 USAGE                                                       *rust-doc.vim-usage*
 
-As described above, 3 interfaces are available.
+As described above, 4 interfaces are available.
 
 ------------------------------------------------------------------------------
 1. |:RustDoc| command
@@ -140,6 +140,29 @@ As described above, 3 interfaces are available.
     of "rust/doc" source as below.
 >
     :Unite rust/doc:modules
+
+
+------------------------------------------------------------------------------
+4. |denite.nvim| source                                 *rust-doc.vim-denite-source*
+
+    You can select from all document candidates with denite.nvim interface.
+>
+    :Denite rust/doc
+<
+    If you want to use denite.nvim for `K` mapping, you can setup in your vimrc as
+    follows.
+>
+    let g:rust_doc#define_map_K = 0
+    augroup vimrc-rust
+        autocmd!
+        autocmd FileType rust nnoremap <buffer><silent>K :<C-u>DeniteCursorWord rust/doc<CR>
+    augroup END
+<
+    It may takes some time.  If you don't want to wait and it is enough for
+    you to search only module names, please specify "modules" to the argument
+    of "rust/doc" source as below.
+>
+    :Denite rust/doc:modules
 <
 
 ==============================================================================
