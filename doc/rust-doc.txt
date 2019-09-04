@@ -17,12 +17,13 @@ License                 |rust-doc.vim-lisence|
 INTRODUCTION                                         *rust-doc.vim-introduction*
 
 *rust-doc.vim* searches documents (standard libraries, libraries your crate
-depends on, and so on) and opens it by browser.  You can use 3 interfaces to
+depends on, and so on) and opens it by browser.  You can use 4 interfaces to
 open them.
 
 - |:RustDoc| command for detailed search
 - |K| mapping in your Rust code to search under the cursor
 - |unite.vim| source to list up all candidates and select one
+- |denite.nvim| source to list up all candidates and select one
 
 
 ==============================================================================
