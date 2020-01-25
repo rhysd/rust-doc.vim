@@ -44,6 +44,34 @@ function! rust_doc#find_std_doc_dir() abort
     return d . '/share/doc/rust/html/'
 endfunction
 
+function! s:nearest_cargo(path) abort
+    return findfile('Cargo.toml', a:path . ';')
+endfunction
+
+function! rust_doc#nearestWorkspaceCargo(path) abort
+    let l:nearest = s:nearest_cargo(a:path)
+    while l:nearest !=# ''
+        for l:line in readfile(l:nearest, '', 0x100)
+            if l:line =~# '\V[workspace]'
+                return l:nearest
+            endif
+        endfor
+        let l:next = fnamemodify(l:nearest, ':p:h:h')
+        let l:nearest = s:nearest_cargo(l:next)
+    endwhile
+    return ''
+endfunction
+
+function! rust_doc#nearestRootCargo(path) abort
+    " Try to find a workspace Cargo.toml, and if not found, take the nearest
+    " regular Cargo.toml file.
+    let l:workspace_cargo = rust_doc#nearestWorkspaceCargo(a:path)
+    if l:workspace_cargo !=# ''
+        return l:workspace_cargo
+    endif
+    return s:nearest_cargo(a:path)
+endfunction
+
 function! rust_doc#find_rust_project_dir(hint) abort
     let path = fnamemodify(a:hint, ':p')
     if filereadable(path)
@@ -55,7 +83,7 @@ function! rust_doc#find_rust_project_dir(hint) abort
         return ''
     endif
 
-    let cargo = findfile('Cargo.toml', path . ';')
+    let cargo = rust_doc#nearestRootCargo(path)
 
     if cargo ==# ''
         call s:error('Cargo.toml is not found')
